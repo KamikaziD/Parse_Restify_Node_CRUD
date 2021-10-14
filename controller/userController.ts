@@ -30,7 +30,7 @@ class UserControllers {
 
                     }
                 }
-                res.send({"AllUsers": allUsersList}).status(httpStatusCode.OK);
+                res.send({ success: true, message: "All users retrieved successfully", allUsersList}).status(httpStatusCode.OK);
             });
 
         } catch(err) {
@@ -52,7 +52,7 @@ class UserControllers {
             
             const user = await query.find();
 
-            res.json({user}).status(httpStatusCode.FOUND);
+            res.json({ success: true, message: "User found successfully", user}).status(httpStatusCode.FOUND);
         
         } catch (err) {
             res.status(httpStatusCode.NOT_FOUND);
@@ -116,31 +116,58 @@ class UserControllers {
 
 
         } catch (err) {
-
+            res.json({ success: false, message: "An error occurred" }).status(httpStatusCode.SERVER_ERROR);
+            next(err); 
         }
     };
 
-    static updateUser(
+    static async updateUser(
         req: restify.Request,
         res: restify.Response,
         next: restify.Next
     ) {
         try {
-            console.log('updateUser')
-        } catch (err) {
+            let { id } = req.params;
+            let { name, age, livingCity } = req.body;
 
+            const User = Parse.Object.extend('Person');
+            const user = new User()
+
+            user.set("id", id);        
+            user.set("name", name);
+            user.set("age", age);
+            user.set("livingCity", livingCity);
+
+            const updatedUser = await user.save()
+
+            res.json({ success: true, message: "User updated successfully", updatedUser }).status(httpStatusCode.OK);
+
+        } catch (err) {
+            res.json({ success: false, message: "An error occurred" }).status(httpStatusCode.SERVER_ERROR);
+            next(err); 
         }
     };
 
-    static deleteUser(
+    static async deleteUser(
         req: restify.Request,
         res: restify.Response,
         next: restify.Next
     ) {
         try {   
-            console.log('deleteUser')
-        } catch (err) {
+            let objectId = req.params.id;
 
+            const Person = Parse.Object.extend('Person');
+            const query = new Parse.Query(Person);
+            console.log(objectId)
+
+            const currentUser = await query.get(objectId);
+            await currentUser.destroy();
+
+            res.json({ success: true, message: "User was deleted" }).status(httpStatusCode.OK);
+
+        } catch (err) {
+            res.json({ success: false, message: "Unable to delete user" }).status(httpStatusCode.SERVER_ERROR);
+            next(err); 
         }
     };
 
