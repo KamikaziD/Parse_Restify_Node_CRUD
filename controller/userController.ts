@@ -4,7 +4,7 @@ import httpStatusCode from '../constants/http_status_code';
 import { JSONParser } from 'formidable';
 
 class UserControllers {
-    static getAllUsers(
+    static async getAllUsers(
         req: restify.Request,
         res: restify.Response,
         next: restify.Next
@@ -12,9 +12,8 @@ class UserControllers {
         try {
             const Person = Parse.Object.extend('Person');
             const query = new Parse.Query(Person);
-            //const allUsersList = query.findAll();
 
-            query.findAll().then((data) => {
+            await query.findAll().then((data) => {
                 let allUsersList = [];
 
                 if (data.length > 0) {
@@ -54,23 +53,7 @@ class UserControllers {
             const user = await query.find();
 
             res.json({user}).status(httpStatusCode.FOUND);
-            // await query.find()
-            
-            // .then((data) => {
-            //     let userById = [];
-
-            //     if (data.length > 0) {
-            //         const user = data[0];
-            //         const visibleContent = {
-            //             "id": user.id,
-            //             "name": user.get("name"),
-            //             "age": user.get("age"),
-            //             "livingCity": user.get("livingCity"),
-            //         };
-            //         userById.push(visibleContent)
-            //     };
-            //     res.send(userById).status(httpStatusCode.FOUND);
-            // });
+        
         } catch (err) {
             res.status(httpStatusCode.NOT_FOUND);
             next(err);
