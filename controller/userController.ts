@@ -1,6 +1,7 @@
 import restify from 'restify';
 import Parse from 'parse/node';
 import httpStatusCode from '../constants/http_status_code';
+import { JSONParser } from 'formidable';
 
 class UserControllers {
     static getAllUsers(
@@ -11,7 +12,8 @@ class UserControllers {
         try {
             const Person = Parse.Object.extend('Person');
             const query = new Parse.Query(Person);
-            // const allUsersList = query.findAll();
+            //const allUsersList = query.findAll();
+
             query.findAll().then((data) => {
                 let allUsersList = [];
 
@@ -29,7 +31,7 @@ class UserControllers {
 
                     }
                 }
-                res.send(allUsersList).status(httpStatusCode.OK);
+                res.send({"AllUsers": allUsersList}).status(httpStatusCode.OK);
             });
 
         } catch(err) {
@@ -49,23 +51,26 @@ class UserControllers {
             console.log(req.params.id)
             query.equalTo('objectId', req.params.id);
             
-            await query.find()
-            
-            .then((data) => {
-                let userById = [];
+            const user = await query.find();
 
-                if (data.length > 0) {
-                    const user = data[0];
-                    const visibleContent = {
-                        "id": user.id,
-                        "name": user.get("name"),
-                        "age": user.get("age"),
-                        "livingCity": user.get("livingCity"),
-                    };
-                    userById.push(visibleContent)
-                };
-                res.send(userById).status(httpStatusCode.FOUND);
-            });
+            res.json({user}).status(httpStatusCode.FOUND);
+            // await query.find()
+            
+            // .then((data) => {
+            //     let userById = [];
+
+            //     if (data.length > 0) {
+            //         const user = data[0];
+            //         const visibleContent = {
+            //             "id": user.id,
+            //             "name": user.get("name"),
+            //             "age": user.get("age"),
+            //             "livingCity": user.get("livingCity"),
+            //         };
+            //         userById.push(visibleContent)
+            //     };
+            //     res.send(userById).status(httpStatusCode.FOUND);
+            // });
         } catch (err) {
             res.status(httpStatusCode.NOT_FOUND);
             next(err);

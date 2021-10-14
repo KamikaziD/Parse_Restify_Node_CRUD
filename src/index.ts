@@ -11,6 +11,7 @@ const server = restify.createServer();
 server.listen(config.SERVER_PORT, function() {
     server.use(restify.plugins.bodyParser());
     server.use(restify.plugins.queryParser());
+    server.use(restify.plugins.jsonp());
     
     //Routes
     
