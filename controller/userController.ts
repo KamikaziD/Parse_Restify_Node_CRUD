@@ -1,7 +1,7 @@
 import restify from 'restify';
 import Parse from 'parse/node';
 import httpStatusCode from '../constants/http_status_code';
-import { JSONParser } from 'formidable';
+import { objectLength } from '../utils/functions';
 
 class UserControllers {
     static async getAllUsers(
@@ -60,13 +60,61 @@ class UserControllers {
         }
     };
 
-    static createUser(
+    static async createUser(
         req: restify.Request,
         res: restify.Response,
         next: restify.Next
     ) {
         try {
-            console.log('createUser');
+            const data = req.body;
+            const { name, age, livingCity } = req.body
+        
+            const Person = Parse.Object.extend('Person');
+                    
+            const person = new Person();
+
+            function setUser(){
+                try { 
+                    person.set("name", name);
+                    person.set("age", age);
+                    person.set("livingCity", livingCity);
+        
+                } catch (e) {
+                    res.status(httpStatusCode.SERVER_ERROR);
+                    res.json({ success: false, message: "Error setting user" });
+                    next(e);
+        
+                };      
+            };
+
+            //<---VALIDATE DATA--->
+            if (!data || objectLength(data) == 0) {
+                return next(new Error);
+            }
+
+            if (!name) {
+                return next(res.json({"err": "No name provided"}) && console.error("No name provided"));
+            }
+
+            if (!age) {
+                return next(res.json({"err": "No age provided"}) && console.error("No age provided"));
+            }
+
+            if (!livingCity) {
+                return next(res.json({"err": "No city provided"}) && console.error("No city provided"));
+            }
+            //<---RUN FUNCTION THEN SAVE--->
+            try { 
+                await setUser(); 
+                await person.save();
+                res.json({ success: true, message: "User has been added", data}).status(httpStatusCode.CREATED);
+
+            } catch (err) {
+                res.json({ success: false, message: "An error occurred" }).status(httpStatusCode.SERVER_ERROR);
+                next(err); 
+            }
+
+
         } catch (err) {
 
         }
