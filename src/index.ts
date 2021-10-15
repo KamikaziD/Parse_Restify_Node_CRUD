@@ -17,6 +17,7 @@ server.listen(config.SERVER_PORT, function() {
     
 
     require('../routes/userRoutes')(server);
+    require('../routes/postRoutes')(server);
 
     initParse(
         config.APP_ID,
