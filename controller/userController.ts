@@ -52,7 +52,11 @@ class UserControllers {
             
             const user = await query.find();
 
-            res.json({ success: true, message: "User found successfully", user}).status(httpStatusCode.FOUND);
+            if (user.length > 0) {
+                res.json({ success: true, message: "User found successfully", user}).status(httpStatusCode.FOUND);
+            }
+
+            res.json({ success: false, message: "No user found"}).status(httpStatusCode.NOT_FOUND)
         
         } catch (err) {
             res.status(httpStatusCode.NOT_FOUND);
