@@ -30,7 +30,7 @@ class UserControllers {
 
                     }
                 }
-                res.send({ success: true, message: "All users retrieved successfully", allUsersList}).status(httpStatusCode.OK);
+                res.send({ success: true, data: allUsersList}).status(httpStatusCode.OK);
             });
 
         } catch(err) {
@@ -53,7 +53,7 @@ class UserControllers {
             const user = await query.find();
 
             if (user.length > 0) {
-                res.json({ success: true, message: "User found successfully", user}).status(httpStatusCode.FOUND);
+                res.json({ success: true, data: user}).status(httpStatusCode.FOUND);
             }
 
             res.json({ success: false, message: "No user found"}).status(httpStatusCode.NOT_FOUND)
@@ -111,7 +111,7 @@ class UserControllers {
             try { 
                 await setUser(); 
                 await person.save();
-                res.json({ success: true, message: "User has been added", data}).status(httpStatusCode.CREATED);
+                res.json({ success: true, data: data}).status(httpStatusCode.CREATED);
 
             } catch (err) {
                 res.json({ success: false, message: "An error occurred" }).status(httpStatusCode.SERVER_ERROR);
@@ -144,7 +144,7 @@ class UserControllers {
 
             const updatedUser = await user.save()
 
-            res.json({ success: true, message: "User updated successfully", updatedUser }).status(httpStatusCode.OK);
+            res.json({ success: true, data: updatedUser }).status(httpStatusCode.OK);
 
         } catch (err) {
             res.json({ success: false, message: "An error occurred" }).status(httpStatusCode.SERVER_ERROR);
